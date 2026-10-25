@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>플래시몹 심사</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --blue:#2563eb; --blue-50:#eff6ff; --blue-100:#dbeafe; --ink:#0f172a; --ink-2:#475569; --ink-3:#94a3b8;
+  --line:#e2e8f0; --bg:#f8fafc; --card:#fff; --ok:#16a34a; --ok-50:#f0fdf4; --warn:#d97706; --warn-50:#fffbeb; --bad:#dc2626;
+  --c1:#2563eb; --c2:#ea580c; --c3:#16a34a; --c4:#9333ea;
+}
+*{box-sizing:border-box}
+html{scroll-padding-bottom:110px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"맑은 고딕",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:12px;height:56px}
+.brand{font-weight:800;font-size:17px;letter-spacing:-.02em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{font-weight:500;color:var(--ink-2);font-size:13px;margin-left:6px}
+.badge{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.badge.demo{background:var(--warn-50);color:var(--warn)}
+.badge.live{background:var(--ok-50);color:var(--ok)}
+.badge.off{background:#fef2f2;color:var(--bad)}
+nav.tabs{display:flex;gap:4px;padding-bottom:8px;overflow-x:auto}
+nav.tabs button{border:0;background:none;padding:8px 14px;border-radius:10px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+nav.tabs button.on{background:var(--blue-50);color:var(--blue)}
+main.wrap{padding:20px 16px 140px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+h2{font-size:20px;margin:0 0 4px;letter-spacing:-.02em}
+h3{font-size:16px;margin:0 0 10px}
+.muted{color:var(--ink-2);font-size:14px}
+.tiny{color:var(--ink-3);font-size:12px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:160px}
+.field label{font-size:13px;font-weight:600;color:var(--ink-2)}
+input[type=text],input[type=password],select{height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff;width:100%}
+input:focus,select:focus{outline:2px solid var(--blue-100);border-color:var(--blue)}
+.btn{height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:600}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.ghost{border-color:transparent;background:none;color:var(--blue)}
+.btn.sm{height:34px;padding:0 12px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.seg{display:inline-flex;background:#eef2f7;border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:none;padding:8px 16px;border-radius:9px;font-weight:700;color:var(--ink-2)}
+.seg button.on{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:thin}
+.chip{flex:0 0 auto;min-width:58px;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:700;position:relative}
+.chip.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.chip .dot{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%}
+.chip .dot.full{background:var(--ok)} .chip .dot.part{background:var(--warn)}
+.chip.on .dot{box-shadow:0 0 0 2px var(--blue)}
+.classhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:4px}
+.big{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.total{font-size:15px;color:var(--ink-2)} .total b{font-size:26px;color:var(--ink);font-variant-numeric:tabular-nums}
+.cat{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+.cat-h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cat-h .bar{width:4px;height:18px;border-radius:2px}
+.cat-h b{font-size:16px} .cat-h .pts{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+.item{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:0}
+.item .nm{font-weight:700;font-size:15px}
+.item .ds{font-size:13px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+.score{display:flex;gap:6px}
+.score button{width:56px;height:50px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:800;font-size:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.score button small{font-size:10px;font-weight:600;color:var(--ink-3);margin-top:4px;white-space:nowrap;letter-spacing:-.04em}
+.score button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.score button.on small{color:#dbeafe}
+.item.empty .nm::after{content:" ·미입력";color:var(--warn);font-size:12px;font-weight:600}
+@media (max-width:640px){
+  .item{grid-template-columns:1fr}
+  .score button{flex:1;width:auto}
+  .dock .wrap{flex-wrap:wrap;gap:6px}
+  .status{order:-1;width:100%;text-align:left;min-width:0}
+  .sub div{padding:5px 8px;font-size:11px}
+}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#fff;border-top:1px solid var(--line);padding:10px 0 calc(10px + env(safe-area-inset-bottom))}
+.dock .wrap{display:flex;align-items:center;gap:10px}
+.sub{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto}
+.sub div{flex:0 0 auto;background:#f1f5f9;border-radius:10px;padding:6px 10px;font-size:12px;color:var(--ink-2);text-align:center}
+.sub div b{display:block;color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+.status{font-size:12px;min-width:84px;text-align:right}
+.status.ok{color:var(--ok)} .status.wait{color:var(--warn)} .status.err{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:center;font-size:14px;white-space:nowrap}
+th{font-size:12.5px;color:var(--ink-2);font-weight:700;background:#f8fafc}
+td.l,th.l{text-align:left;white-space:normal}
+tr.r1 td{background:#fef9c3} tr.r2 td{background:#fefce8} tr.r3 td{background:#fffbeb}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.tbl table th:first-child,.tbl table td:first-child{padding-left:14px}
+.award{font-weight:800;color:#a16207}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+.stat{border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat .k{font-size:13px;color:var(--ink-2);font-weight:600}
+.stat .v{font-size:20px;font-weight:800;margin-top:4px}
+.prog td{padding:6px 4px;font-size:12px}
+.mark{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:6px;font-weight:700;font-size:12px}
+.mark.f{background:var(--ok-50);color:var(--ok)} .mark.p{background:var(--warn-50);color:var(--warn)} .mark.n{color:var(--ink-3)}
+.hidden{display:none!important}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:8px}
+.crit td{white-space:normal}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="hrow">
+      <div class="brand">학교폭력 예방 플래시몹 심사<small id="schoolName"></small></div>
+      <span id="modeBadge" class="badge demo">데모 모드</span>
+    </div>
+    <nav class="tabs">
+      <button data-tab="score" class="on">채점</button>
+      <button data-tab="result">집계·순위 (관리자)</button>
+      <button data-tab="criteria">심사기준</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- ===== 채점 ===== -->
+  <section id="tab-score">
+    <div id="judgeLogin" class="card">
+      <h2>심사위원 확인</h2>
+      <p class="muted">본인 심사위원 번호를 고르고 시작하세요. 다른 기기에서 같은 번호로 들어오면 저장된 점수를 이어서 볼 수 있습니다.</p>
+      <div class="row" style="margin-top:12px">
+        <div class="field"><label for="jNo">심사위원 번호</label><select id="jNo"></select></div>
+        <div class="field"><label for="jName">성명 (선택)</label><input id="jName" type="text" placeholder="예: 홍길동" maxlength="20"></div>
+      </div>
+      <div class="row" style="margin-top:16px"><button id="jStart" class="btn primary">채점 시작</button></div>
+    </div>
+
+    <div id="scorer" class="hidden">
+      <div class="card" style="padding:14px 16px">
+        <div class="row" style="justify-content:space-between">
+          <div><b id="judgeLabel"></b> <button id="jChange" class="btn ghost sm">변경</button></div>
+          <div class="seg" id="gradeSeg"></div>
+        </div>
+        <div class="chips" id="classChips" style="margin-top:10px"></div>
+        <div class="legend"><span><span style="color:var(--ok)">●</span> 채점 완료</span><span><span style="color:var(--warn)">●</span> 일부 입력</span><span class="tiny">점수를 누르면 자동 저장됩니다</span></div>
+      </div>
+
+      <div class="card">
+        <div class="classhead">
+          <div><div class="big" id="classTitle"></div><div class="tiny" id="classHint"></div></div>
+          <div class="total">합계 <b id="totalNow">0</b> / 100</div>
+        </div>
+        <div id="catList"></div>
+        <div class="row" style="justify-content:space-between;margin-top:18px">
+          <button id="prevCls" class="btn">← 이전 반</button>
+          <button id="clearCls" class="btn ghost sm">이 반 점수 지우기</button>
+          <button id="nextCls" class="btn primary">다음 반 →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 집계 ===== -->
+  <section id="tab-result" class="hidden">
+    <div id="adminLogin" class="card">
+      <h2>관리자 확인</h2>
+      <p class="muted">집계와 순위는 관리자 PIN을 입력해야 볼 수 있습니다. <span id="demoPinHint"></span></p>
+      <div class="row" style="margin-top:12px">
+        <div class="field" style="max-width:240px"><label for="pin">관리자 PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="off"></div>
+        <button id="pinBtn" class="btn primary" style="align-self:flex-end">확인</button>
+      </div>
+    </div>
+
+    <div id="adminView" class="hidden">
+      <div class="card" style="padding:14px 16px">
+        <div class="row" style="justify-content:space-between">
+          <div class="seg" id="gradeSeg2"></div>
+          <div class="row" style="gap:8px">
+            <span class="tiny" id="lastLoad"></span>
+            <label class="tiny"><input type="checkbox" id="autoRef" checked> 20초 자동 새로고침</label>
+            <button id="refBtn" class="btn sm">새로고침</button>
+            <button id="xlsBtn" class="btn sm primary">엑셀 내보내기</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2" id="specials"></div>
+
+      <div class="card">
+        <h3>학급별 순위 <span class="tiny">심사위원 평균 · 동점 시 협동심 → 질서 → 창의성 → 호응도</span></h3>
+        <div class="tbl"><table id="rankTbl"></table></div>
+        <p class="tiny" style="margin-top:8px">평균에는 20개 항목을 모두 채점한 기록만 들어갑니다. 일부만 입력한 기록은 아래 진행 현황에 △로 표시됩니다.</p>
+      </div>
+
+      <div class="card">
+        <h3>심사위원 채점 진행 현황</h3>
+        <div class="tbl"><table id="progTbl" class="prog"></table></div>
+        <div class="legend"><span><span class="mark f">✓</span> 완료</span><span><span class="mark p">△</span> 일부 입력</span><span><span class="mark n">–</span> 미입력</span></div>
+      </div>
+
+      <div class="card" id="demoTools">
+        <h3>데모 도구</h3>
+        <p class="muted">구글 시트에 연결하기 전에 미리 써 볼 수 있도록 이 브라우저에만 저장됩니다.</p>
+        <div class="row" style="margin-top:10px"><button id="seedBtn" class="btn">예시 점수 만들기</button><button id="wipeBtn" class="btn">데모 데이터 모두 지우기</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 심사기준 ===== -->
+  <section id="tab-criteria" class="hidden">
+    <div class="card">
+      <h2>심사기준</h2>
+      <p class="muted">협동심 30 · 창의성 30 · 질서 30 · 학급별 호응도 10 = 100점</p>
+      <div class="tbl" style="margin-top:12px"><table id="critTbl" class="crit"></table></div>
+    </div>
+    <div class="card">
+      <h3>채점 척도와 운영 기준</h3>
+      <div class="tbl"><table>
+        <tr><th>배점</th><th>매우 우수</th><th>우수</th><th>보통</th><th>미흡</th><th>매우 미흡</th></tr>
+        <tr><td>6점 항목</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td></tr>
+        <tr><td>2점 항목</td><td>2</td><td>–</td><td>1</td><td>–</td><td>0</td></tr>
+      </table></div>
+      <ul class="muted" style="line-height:1.8;margin:14px 0 0;padding-left:18px">
+        <li>질서는 무대 입장부터 퇴장까지 무대 안에서 일어나는 모습만 채점합니다.</li>
+        <li>호응도 1~3번은 공연하는 학급, 4~5번은 관람하는 학급을 봅니다. 4~5번은 그 학년 공연이 모두 끝난 뒤 채점합니다.</li>
+        <li>학급 점수는 심사위원 점수의 평균이며, 동점이면 협동심 → 질서 → 창의성 → 호응도 순으로 높은 학급이 앞섭니다.</li>
+        <li>질서상은 질서 점수, 단합상은 협동심 점수가 가장 높은 학급에 줍니다(종합 시상과 겹치면 심사위원회에서 협의).</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<div class="dock hidden" id="dock">
+  <div class="wrap">
+    <div class="sub" id="subBar"></div>
+    <div class="status" id="saveStatus"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   1) 설정 — 학교 상황에 맞게 이 부분만 고치면 됩니다
+   ===================================================================== */
+const CONFIG = {
+  // Apps Script 웹앱 배포 URL (…/exec). 비워 두면 '데모 모드'로 이 브라우저에만 저장됩니다.
+  GAS_URL: '',
+  SCHOOL: '수완하나중학교',
+  CLASSES: { 1: 10, 2: 11, 3: 11 },   // 학년별 학급 수
+  JUDGES: 10,                          // 심사위원 수
+  DEMO_PIN: '0000',                    // 데모 모드 관리자 PIN (실제 PIN은 Code.gs에서 정합니다)
+  REFRESH_SEC: 20
+};
+
+/* =====================================================================
+   2) 심사기준 데이터 (엑셀 '심사기준' 시트와 동일)
+   ===================================================================== */
+const CATS = [
+  { key:'협동심', max:30, color:'var(--c1)', items:[
+    ['전원 참여','학급 학생이 빠짐없이 무대에 함께 서는가',6],
+    ['동작 일치도','군무 동작과 박자가 서로 잘 맞는가',6],
+    ['대형 전환','대형 이동과 전환이 부딪힘 없이 매끄러운가',6],
+    ['역할 분담·배려','역할이 고르게 돌아가고 소외되는 학생이 없는가',6],
+    ['연습 완성도','실수해도 서로 이어받는 등 함께 연습한 흔적이 보이는가',6]]},
+  { key:'창의성', max:30, color:'var(--c2)', items:[
+    ['주제 전달력','학교폭력 예방, 배려와 존중의 메시지가 담겼는가',6],
+    ['자유곡 선곡·편곡','주제에 맞게 곡을 고르고 이어 붙였는가',6],
+    ['안무 독창성','학급만의 안무를 만들었는가',6],
+    ['구성·연출','흐름이 있고, 깜짝 등장이나 반전 같은 플래시몹 요소가 있는가',6],
+    ['소품·구호 활용','피켓, 구호, 메시지를 효과적으로 썼는가 (비싼 소품은 가산하지 않음)',6]]},
+  { key:'질서', max:30, color:'var(--c3)', items:[
+    ['무대 입장','호명되면 빠르고 조용하게 무대에 오르는가',6],
+    ['시작 준비','음악이 시작되기 전에 모두 정해진 위치에서 대기하는가',6],
+    ['공간·간격 유지','무대 경계 안에서 간격을 지키고 서로 부딪히지 않는가',6],
+    ['안전·바른 언행','위험한 동작이나 장난, 불쾌감을 주는 동작·언행이 없는가',6],
+    ['퇴장·무대 정리','공연 후 소품을 챙기고 정해진 시간 안에 질서 있게 퇴장하는가',6]]},
+  { key:'호응도', max:10, color:'var(--c4)', items:[
+    ['관객 반응','공연 중 객석에서 박수와 환호가 자연스럽게 나오는가',2],
+    ['호응 유도','박수 유도, 구호 따라 하기 등 관객이 함께하는 구간이 있는가',2],
+    ['표정·에너지','학생들이 즐겁고 자신감 있게 공연하는가',2],
+    ['다른 반 응원','다른 반이 공연할 때 박수와 응원으로 호응하는가 (학년 공연이 모두 끝난 뒤 채점)',2],
+    ['존중하는 응원','야유나 비방 없이 서로 존중하며 응원하는가 (학년 공연이 모두 끝난 뒤 채점)',2]]}
+];
+const ITEMS = CATS.flatMap(c => c.items.map(i => ({ cat:c.key, name:i[0], desc:i[1], max:i[2] })));
+const N_ITEMS = ITEMS.length; // 20
+const SCALE = { 6:[[6,'매우우수'],[5,'우수'],[4,'보통'],[3,'미흡'],[2,'매우미흡']], 2:[[2,'우수'],[1,'보통'],[0,'미흡']] };
+
+/* =====================================================================
+   3) 저장소 도우미 (localStorage가 막힌 환경에서도 동작)
+   ===================================================================== */
+const mem = {};
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? (k in mem ? mem[k] : d) : JSON.parse(v); }catch(e){ return k in mem ? mem[k] : d; } },
+  set(k, v){ mem[k] = v; try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ delete mem[k]; try{ localStorage.removeItem(k); }catch(e){} }
+};
+const DEMO = !CONFIG.GAS_URL;
+
+/* =====================================================================
+   4) 서버(API) 계층 — Apps Script는 GET + URL 파라미터로 호출 (CORS 회피)
+   ===================================================================== */
+const api = {
+  async call(params){
+    if (DEMO) return demoApi(params);
+    const url = CONFIG.GAS_URL + '?' + new URLSearchParams(params).toString();
+    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    if (!j.ok) throw new Error(j.error || '서버 오류');
+    return j;
+  },
+  save(rec){ return this.call({ action:'save', data: JSON.stringify(rec) }); },
+  mine(judge){ return this.call({ action:'mine', judge }); },
+  all(pin){ return this.call({ action:'all', pin }); },
+  checkPin(pin){ return this.call({ action:'checkPin', pin }); }
+};
+// 데모 모드: 같은 동작을 이 브라우저 안에서 흉내 냅니다
+function demoApi(p){
+  const db = LS.get('fm_demo_db', []);
+  const key = r => `${r.judge}-${r.grade}-${r.cls}`;
+  switch(p.action){
+    case 'save': {
+      const rec = JSON.parse(p.data); rec.ts = new Date().toISOString();
+      const i = db.findIndex(r => key(r) === key(rec));
+      if (i >= 0) db[i] = rec; else db.push(rec);
+      LS.set('fm_demo_db', db); return Promise.resolve({ ok:true, ts:rec.ts });
+    }
+    case 'mine': return Promise.resolve({ ok:true, records: db.filter(r => String(r.judge) === String(p.judge)) });
+    case 'checkPin': return p.pin === CONFIG.DEMO_PIN ? Promise.resolve({ ok:true }) : Promise.reject(new Error('PIN이 맞지 않습니다.'));
+    case 'all': return p.pin === CONFIG.DEMO_PIN ? Promise.resolve({ ok:true, records: db }) : Promise.reject(new Error('PIN이 맞지 않습니다.'));
+  }
+  return Promise.reject(new Error('unknown action'));
+}
+
+/* =====================================================================
+   5) 점수 계산 (엑셀 집계표와 같은 규칙)
+   ===================================================================== */
+const r2 = x => Math.round(x * 100) / 100;
+function catSums(items){
+  let i = 0; const out = {};
+  for (const c of CATS){ let s = 0, n = 0; for (let k = 0; k < c.items.length; k++, i++){ const v = items[i]; if (v != null){ s += v; n++; } } out[c.key] = n ? s : null; }
+  return out;
+}
+const filled = items => items.filter(v => v != null).length;
+function aggregate(records, grade){
+  const n = CONFIG.CLASSES[grade];
+  const rows = [];
+  for (let c = 1; c <= n; c++){
+    const recs = records.filter(r => +r.grade === +grade && +r.cls === c && filled(r.items) === N_ITEMS);
+    const row = { cls:c, judges:recs.length };
+    if (recs.length){
+      for (const cat of CATS){ row[cat.key] = r2(recs.reduce((a, r) => a + catSums(r.items)[cat.key], 0) / recs.length); }
+      row.total = r2(CATS.reduce((a, cat) => a + row[cat.key], 0));
+    }
+    rows.push(row);
+  }
+  // 동점 처리: 합계 → 협동심 → 질서 → 창의성 → 호응도
+  const order = ['total','협동심','질서','창의성','호응도'];
+  const better = (a, b) => { for (const k of order){ if (a[k] !== b[k]) return a[k] > b[k]; } return false; };
+  const scored = rows.filter(r => r.total != null);
+  for (const r of scored){
+    r.rank = 1 + scored.filter(o => better(o, r)).length;
+    r.coopRank = 1 + scored.filter(o => o['협동심'] > r['협동심']).length;
+    r.orderRank = 1 + scored.filter(o => o['질서'] > r['질서']).length;
+    r.award = r.rank === 1 ? '종합우승' : r.rank === 2 ? '준우승' : r.rank === 3 ? '종합3위' : '';
+  }
+  return rows;
+}
+
+/* =====================================================================
+   6) 화면 상태
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const state = {
+  judge: LS.get('fm_judge', null),         // {no, name}
+  grade: LS.get('fm_grade', 1),
+  cls: LS.get('fm_cls', 1),
+  scores: LS.get('fm_scores', {}),         // "학년-반" → [20개 점수]
+  pending: LS.get('fm_pending', {}),       // 아직 서버에 못 보낸 기록
+  adminPin: null, adminGrade: 1, records: [], timer: null
+};
+const keyOf = (g, c) => `${g}-${c}`;
+const itemsOf = (g, c) => state.scores[keyOf(g, c)] || Array(N_ITEMS).fill(null);
+
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200); }
+
+/* ---------- 탭 ---------- */
+document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+function showTab(t){
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  for (const id of ['score','result','criteria']) $('#tab-' + id).classList.toggle('hidden', id !== t);
+  $('#dock').classList.toggle('hidden', !(t === 'score' && state.judge));
+  if (t === 'result' && state.adminPin) loadAll();
+}
+
+/* ---------- 심사위원 로그인 ---------- */
+function initJudge(){
+  $('#jNo').innerHTML = Array.from({ length: CONFIG.JUDGES }, (_, i) => `<option value="${i + 1}">심사위원 ${i + 1}</option>`).join('');
+  if (state.judge){ $('#jNo').value = state.judge.no; $('#jName').value = state.judge.name || ''; }
+  $('#jStart').onclick = async () => {
+    const no = +$('#jNo').value, name = $('#jName').value.trim();
+    if (state.judge && state.judge.no !== no){ state.scores = {}; LS.set('fm_scores', {}); }
+    state.judge = { no, name }; LS.set('fm_judge', state.judge);
+    await restoreMine(); renderScorer();
+  };
+  $('#jChange').onclick = () => { $('#scorer').classList.add('hidden'); $('#judgeLogin').classList.remove('hidden'); $('#dock').classList.add('hidden'); };
+  if (state.judge) renderScorer();
+}
+// 다른 기기에서 저장한 내 점수 불러오기 (아직 안 보낸 로컬 점수가 우선)
+async function restoreMine(){
+  try{
+    const { records } = await api.mine(state.judge.no);
+    for (const r of records){ const k = keyOf(r.grade, r.cls); if (!state.pending[k]) state.scores[k] = r.items.map(v => v === '' || v == null ? null : +v); }
+    LS.set('fm_scores', state.scores);
+  }catch(e){ toast('저장된 점수를 불러오지 못했습니다: ' + e.message); }
+}
+
+/* ---------- 채점 화면 ---------- */
+function gradeSeg(el, cur, onPick){
+  el.innerHTML = Object.keys(CONFIG.CLASSES).map(g => `<button data-g="${g}" class="${+g === +cur ? 'on' : ''}">${g}학년</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => onPick(+b.dataset.g));
+}
+function renderScorer(){
+  $('#judgeLogin').classList.add('hidden'); $('#scorer').classList.remove('hidden');
+  $('#dock').classList.toggle('hidden', $('#tab-score').classList.contains('hidden'));
+  $('#judgeLabel').textContent = `심사위원 ${state.judge.no}` + (state.judge.name ? ` · ${state.judge.name}` : '');
+  if (state.cls > CONFIG.CLASSES[state.grade]) state.cls = 1;
+  gradeSeg($('#gradeSeg'), state.grade, g => { state.grade = g; state.cls = 1; LS.set('fm_grade', g); LS.set('fm_cls', 1); renderScorer(); });
+  const n = CONFIG.CLASSES[state.grade];
+  $('#classChips').innerHTML = Array.from({ length: n }, (_, i) => {
+    const c = i + 1, f = filled(itemsOf(state.grade, c));
+    const dot = f === N_ITEMS ? 'full' : f > 0 ? 'part' : '';
+    return `<button class="chip ${c === state.cls ? 'on' : ''}" data-c="${c}">${c}반${dot ? `<span class="dot ${dot}"></span>` : ''}</button>`;
+  }).join('');
+  $('#classChips').querySelectorAll('.chip').forEach(b => b.onclick = () => pickClass(+b.dataset.c));
+  const on = $('#classChips .chip.on'); if (on) on.scrollIntoView({ block:'nearest', inline:'center' });
+  renderClass();
+}
+function pickClass(c){ state.cls = c; LS.set('fm_cls', c); renderScorer(); window.scrollTo({ top:0, behavior:'smooth' }); }
+
+function renderClass(){
+  const g = state.grade, c = state.cls, items = itemsOf(g, c);
+  $('#classTitle').textContent = `${g}학년 ${c}반`;
+  const f = filled(items);
+  $('#classHint').textContent = f === N_ITEMS ? '20개 항목 채점 완료' : `${f} / ${N_ITEMS}개 항목 입력`;
+  let idx = 0, html = '';
+  for (const cat of CATS){
+    html += `<div class="cat"><div class="cat-h"><i class="bar" style="background:${cat.color}"></i><b>${cat.key}</b><span class="tiny">${cat.max}점 만점</span><span class="pts" data-sum="${cat.key}"></span></div>`;
+    for (const it of cat.items){
+      const v = items[idx];
+      html += `<div class="item ${v == null ? 'empty' : ''}" data-i="${idx}"><div><div class="nm">${idx % 5 + 1}. ${esc(it[0])}</div><div class="ds">${esc(it[1])}</div></div><div class="score">` +
+        SCALE[it[2]].map(([p, lab]) => `<button data-v="${p}" class="${v === p ? 'on' : ''}" aria-label="${p}점 ${lab}">${p}<small>${lab}</small></button>`).join('') + `</div></div>`;
+      idx++;
+    }
+    html += `</div>`;
+  }
+  $('#catList').innerHTML = html;
+  $('#catList').querySelectorAll('.item').forEach(row => {
+    row.querySelectorAll('button').forEach(b => b.onclick = () => setScore(+row.dataset.i, +b.dataset.v));
+  });
+  $('#prevCls').disabled = c <= 1;
+  $('#nextCls').textContent = c >= CONFIG.CLASSES[g] ? '처음 반으로' : '다음 반 →';
+  updateSums();
+}
+function updateSums(){
+  const items = itemsOf(state.grade, state.cls), s = catSums(items);
+  let total = 0;
+  for (const cat of CATS){ const el = document.querySelector(`[data-sum="${cat.key}"]`); if (el) el.textContent = s[cat.key] == null ? '–' : s[cat.key]; total += s[cat.key] || 0; }
+  $('#totalNow').textContent = total;
+  $('#subBar').innerHTML = CATS.map(cat => `<div>${cat.key}<b>${s[cat.key] ?? '–'}<span class="tiny">/${cat.max}</span></b></div>`).join('') + `<div style="background:var(--blue-50);color:var(--blue)">합계<b style="color:var(--blue)">${total}</b></div>`;
+}
+function setScore(i, v){
+  const k = keyOf(state.grade, state.cls);
+  const items = itemsOf(state.grade, state.cls).slice();
+  items[i] = items[i] === v ? null : v;          // 같은 점수를 다시 누르면 취소
+  state.scores[k] = items; LS.set('fm_scores', state.scores);
+  const row = document.querySelector(`.item[data-i="${i}"]`);
+  row.classList.toggle('empty', items[i] == null);
+  row.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.v === items[i]));
+  const f = filled(items);
+  $('#classHint').textContent = f === N_ITEMS ? '20개 항목 채점 완료' : `${f} / ${N_ITEMS}개 항목 입력`;
+  const chip = document.querySelector(`.chip[data-c="${state.cls}"]`);
+  if (chip){ chip.querySelector('.dot')?.remove(); if (f) chip.insertAdjacentHTML('beforeend', `<span class="dot ${f === N_ITEMS ? 'full' : 'part'}"></span>`); }
+  updateSums();
+  queueSave(state.grade, state.cls);
+}
+$('#prevCls').onclick = () => { if (state.cls > 1) pickClass(state.cls - 1); };
+$('#nextCls').onclick = () => pickClass(state.cls >= CONFIG.CLASSES[state.grade] ? 1 : state.cls + 1);
+$('#clearCls').onclick = () => {
+  if (!filled(itemsOf(state.grade, state.cls))) return;
+  state.scores[keyOf(state.grade, state.cls)] = Array(N_ITEMS).fill(null); LS.set('fm_scores', state.scores);
+  queueSave(state.grade, state.cls); renderScorer(); toast('이 반 점수를 지웠습니다.');
+};
+
+/* ---------- 자동 저장 + 오프라인 대기열 ---------- */
+let saveTimer = null, flushing = false, again = false;
+function setStatus(cls, text){ const el = $('#saveStatus'); el.className = 'status ' + cls; el.textContent = text; }
+function queueSave(g, c){
+  const items = itemsOf(g, c);
+  state.pending[keyOf(g, c)] = { judge: state.judge.no, name: state.judge.name || '', grade: g, cls: c, items };
+  LS.set('fm_pending', state.pending);
+  setStatus('wait', '저장 중…');
+  clearTimeout(saveTimer); saveTimer = setTimeout(flush, 800);
+}
+async function flush(){
+  if (flushing){ again = true; return; }
+  flushing = true;
+  try{
+    for (const k of Object.keys(state.pending)){
+      const rec = state.pending[k];
+      await api.save(rec);
+      if (state.pending[k] === rec){ delete state.pending[k]; LS.set('fm_pending', state.pending); }
+    }
+    if (Object.keys(state.pending).length){ again = true; return; }
+    const t = new Date(); setStatus('ok', `저장됨 ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`);
+    setBadge(true);
+  }catch(e){
+    setStatus('err', '미전송 ' + Object.keys(state.pending).length + '건 · 재시도');
+    setBadge(false);
+    clearTimeout(saveTimer); saveTimer = setTimeout(flush, 10000);
+  }finally{ flushing = false; if (again){ again = false; setTimeout(flush, 300); } }
+}
+window.addEventListener('online', flush);
+function setBadge(ok){
+  const b = $('#modeBadge');
+  if (DEMO){ b.className = 'badge demo'; b.textContent = '데모 모드'; return; }
+  b.className = 'badge ' + (ok ? 'live' : 'off'); b.textContent = ok ? '구글 시트 연결됨' : '연결 끊김';
+}
+
+/* ---------- 관리자: 집계 ---------- */
+$('#pinBtn').onclick = async () => {
+  const pin = $('#pin').value.trim(); if (!pin) return;
+  try{ await api.checkPin(pin); state.adminPin = pin; $('#adminLogin').classList.add('hidden'); $('#adminView').classList.remove('hidden'); loadAll(); startAuto(); }
+  catch(e){ toast(e.message); }
+};
+$('#pin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#pinBtn').click(); });
+$('#refBtn').onclick = () => loadAll();
+$('#autoRef').onchange = startAuto;
+function startAuto(){ clearInterval(state.timer); if ($('#autoRef').checked) state.timer = setInterval(() => { if (!$('#tab-result').classList.contains('hidden')) loadAll(true); }, CONFIG.REFRESH_SEC * 1000); }
+async function loadAll(quiet){
+  try{
+    const { records } = await api.all(state.adminPin);
+    state.records = records.map(r => ({ ...r, grade:+r.grade, cls:+r.cls, judge:+r.judge, items: r.items.map(v => v === '' || v == null ? null : +v) }));
+    const t = new Date(); $('#lastLoad').textContent = `${t.toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', second:'2-digit' })} 기준`;
+    renderAdmin(); setBadge(true);
+  }catch(e){ if (!quiet) toast('불러오기 실패: ' + e.message); setBadge(false); }
+}
+function renderAdmin(){
+  const g = state.adminGrade;
+  gradeSeg($('#gradeSeg2'), g, ng => { state.adminGrade = ng; renderAdmin(); });
+  const rows = aggregate(state.records, g);
+  const sorted = rows.slice().sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999) || a.cls - b.cls);
+  const f = v => v == null ? '–' : v.toFixed(2);
+  $('#rankTbl').innerHTML = `<tr><th>순위</th><th>반</th>${CATS.map(c => `<th>${c.key}<br><span class="tiny">${c.max}</span></th>`).join('')}<th>합계<br><span class="tiny">100</span></th><th>심사위원</th><th>시상</th></tr>` +
+    sorted.map(r => `<tr class="${r.rank && r.rank <= 3 ? 'r' + r.rank : ''}"><td><b>${r.rank ?? '–'}</b></td><td><b>${r.cls}반</b></td>${CATS.map(c => `<td>${f(r[c.key])}</td>`).join('')}<td><b>${f(r.total)}</b></td><td>${r.judges}명</td><td class="award">${r.award || ''}</td></tr>`).join('');
+
+  // 특별상 후보 (종합 시상과 겹치면 다음 순위도 표시)
+  const scored = rows.filter(r => r.total != null);
+  const special = (title, key, label) => {
+    if (!scored.length) return `<div class="stat"><div class="k">${title}</div><div class="v">–</div></div>`;
+    const list = scored.slice().sort((a, b) => b[key] - a[key]);
+    const top = list.filter(r => r[key] === list[0][key]);
+    const overlap = top.some(r => r.award);
+    const alt = overlap ? list.find(r => !r.award) : null;
+    return `<div class="stat"><div class="k">${title} · ${label} 1위</div><div class="v">${top.map(r => r.cls + '반').join(', ')} <span class="tiny">${list[0][key].toFixed(2)}점</span></div>` +
+      (overlap ? `<div class="tiny" style="margin-top:4px">종합 시상과 겹칩니다.${alt ? ` 종합 시상 제외 시 1위: <b>${alt.cls}반</b> (${alt[key].toFixed(2)}점)` : ''}</div>` : '') + `</div>`;
+  };
+  $('#specials').innerHTML = special('단합상', '협동심', '협동심') + special('질서상', '질서', '질서');
+
+  // 진행 현황
+  const n = CONFIG.CLASSES[g];
+  let ph = `<tr><th class="l">심사위원</th>${Array.from({ length:n }, (_, i) => `<th>${i + 1}반</th>`).join('')}<th>완료</th></tr>`;
+  for (let j = 1; j <= CONFIG.JUDGES; j++){
+    const mine = state.records.filter(r => r.judge === j && r.grade === g);
+    const nm = mine.find(r => r.name)?.name || '';
+    let done = 0;
+    ph += `<tr><td class="l">${j}${nm ? ' · ' + esc(nm) : ''}</td>` + Array.from({ length:n }, (_, i) => {
+      const r = mine.find(x => x.cls === i + 1), k = r ? filled(r.items) : 0;
+      if (k === N_ITEMS) done++;
+      return `<td><span class="mark ${k === N_ITEMS ? 'f' : k ? 'p' : 'n'}">${k === N_ITEMS ? '✓' : k ? '△' : '–'}</span></td>`;
+    }).join('') + `<td><b>${done}</b>/${n}</td></tr>`;
+  }
+  $('#progTbl').innerHTML = ph;
+  $('#demoTools').classList.toggle('hidden', !DEMO);
+}
+
+/* ---------- 엑셀 내보내기 (SheetJS) ---------- */
+$('#xlsBtn').onclick = () => {
+  if (typeof XLSX === 'undefined'){ toast('엑셀 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
+  const wb = XLSX.utils.book_new();
+  const sum = [['학년','반','협동심(30)','창의성(30)','질서(30)','호응도(10)','합계(100)','심사위원 수','학년 순위','종합 시상','협동심 순위(단합상)','질서 순위(질서상)']];
+  for (const g of Object.keys(CONFIG.CLASSES).map(Number)){
+    for (const r of aggregate(state.records, g)) sum.push([g, r.cls, r['협동심'] ?? '', r['창의성'] ?? '', r['질서'] ?? '', r['호응도'] ?? '', r.total ?? '', r.judges, r.rank ?? '', r.award || '', r.coopRank ?? '', r.orderRank ?? '']);
+  }
+  const ws1 = XLSX.utils.aoa_to_sheet(sum); ws1['!cols'] = sum[0].map((_, i) => ({ wch: i < 2 ? 6 : 12 }));
+  XLSX.utils.book_append_sheet(wb, ws1, '집계표');
+  const raw = [['심사위원','성명','학년','반', ...ITEMS.map(i => `${i.cat}-${i.name}`), '협동심','창의성','질서','호응도','합계','입력 항목 수','저장 시각']];
+  const recs = state.records.slice().sort((a, b) => a.judge - b.judge || a.grade - b.grade || a.cls - b.cls);
+  for (const r of recs){ const s = catSums(r.items); raw.push([r.judge, r.name || '', r.grade, r.cls, ...r.items.map(v => v ?? ''), ...CATS.map(c => s[c.key] ?? ''), CATS.reduce((a, c) => a + (s[c.key] || 0), 0), filled(r.items), r.ts ? new Date(r.ts).toLocaleString('ko-KR') : '']); }
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(raw), '심사위원 원점수');
+  const d = new Date();
+  XLSX.writeFile(wb, `플래시몹_집계_${d.getMonth() + 1}월${d.getDate()}일_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}.xlsx`);
+};
+
+/* ---------- 데모 도구 ---------- */
+$('#seedBtn').onclick = () => {
+  const db = [];
+  const pick = (max) => max === 6 ? 2 + Math.floor(Math.random() * 5) : Math.floor(Math.random() * 3);
+  for (let j = 1; j <= Math.min(6, CONFIG.JUDGES); j++) for (const g of Object.keys(CONFIG.CLASSES).map(Number)) for (let c = 1; c <= CONFIG.CLASSES[g]; c++){
+    const items = ITEMS.map(it => Math.max(it.max === 6 ? 2 : 0, Math.min(it.max, pick(it.max) + (c % 3 === 0 ? 1 : 0))));
+    if (j === 6 && c > 7) items[19] = null;   // 일부 입력 예시
+    db.push({ judge:j, name:'', grade:g, cls:c, items, ts:new Date().toISOString() });
+  }
+  LS.set('fm_demo_db', db); loadAll(); toast('심사위원 6명분 예시 점수를 만들었습니다.');
+};
+$('#wipeBtn').onclick = () => { LS.set('fm_demo_db', []); state.scores = {}; LS.set('fm_scores', {}); state.pending = {}; LS.set('fm_pending', {}); loadAll(); if (state.judge) renderScorer(); toast('데모 데이터를 지웠습니다.'); };
+
+/* ---------- 심사기준 표 ---------- */
+function renderCriteria(){
+  let h = `<tr><th>영역</th><th>번호</th><th class="l">심사 항목</th><th class="l">확인 내용</th><th>배점</th></tr>`;
+  for (const cat of CATS) cat.items.forEach((it, i) => {
+    h += `<tr>${i === 0 ? `<td rowspan="5" style="font-weight:800;color:${cat.color}">${cat.key}<br><span class="tiny">${cat.max}점</span></td>` : ''}<td>${i + 1}</td><td class="l"><b>${esc(it[0])}</b></td><td class="l">${esc(it[1])}</td><td>${it[2]}</td></tr>`;
+  });
+  h += `<tr><td colspan="4"><b>합계</b></td><td><b>100</b></td></tr>`;
+  $('#critTbl').innerHTML = h;
+}
+
+/* ---------- 시작 ---------- */
+$('#schoolName').textContent = CONFIG.SCHOOL;
+$('#demoPinHint').textContent = DEMO ? `데모 모드 PIN은 ${CONFIG.DEMO_PIN} 입니다.` : '';
+setBadge(true);
+renderCriteria();
+initJudge();
+showTab('score');
+if (Object.keys(state.pending).length && state.judge) flush();
+</script>
+</body>
+</html>
